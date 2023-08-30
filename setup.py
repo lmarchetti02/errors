@@ -7,7 +7,7 @@ setup(
     description="A library for propagating uncertainties easily.",
     author="Luca Marchetti",
     license="MIT",
-    install_requires=["sympy", "logging"],
+    install_requires=["sympy", "logging", "numpy"],
     setup_requires=["pytest-runner"],
     tests_require=["pytest>=4.4.1"],
     test_suite="tests",
