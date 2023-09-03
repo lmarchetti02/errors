@@ -1,6 +1,6 @@
 import logging, os
 from typing import Optional, List, Tuple
-from numpy import array, sqrt, ndarray
+from numpy import array, sqrt, ndarray, float64
 from sympy import symbols, diff, lambdify
 from sympy.parsing.mathematica import parse_mathematica
 
@@ -8,13 +8,11 @@ from sympy.parsing.mathematica import parse_mathematica
 # global variables
 logger: logging.Logger = None
 logger_f: logging.Logger = None
-variabili = []  # lista delle variabili x_1,...,x_n
-derivate = []  # lista dei valori delle derivate parziali nei punti (x_10,...,x_n0)
 
 
 class Functions:
     @staticmethod
-    def activate_logging(log_file: Optional[str] = "log.log", **kwargs):
+    def activate_logging(log_file: Optional[str] = "log.log", **kwargs) -> None:
         """
         Questa funzione attiva il logging della libreria propagazione.
 
@@ -73,38 +71,32 @@ class Functions:
             raise TypeError("The 'status' must be of the bool type.")
 
     @staticmethod
-    def def_variabili(N: int, nomi: tuple):
+    def def_variabili(nomi: tuple) -> list:
         """
         Questa funzione definisce le variabili Sympy che vengono poi usate per i calcoli simbolici.
-        In particolare modifica la lista globale `variabili` aggiungendole le variabili appena definite.
+        Restituisce una lista con le variabili definite.
 
         Parametri
         ----------
-        N: int
-            Numero di variabili della funzione G(x_1,...,x_n).
         nomi: tuple
             Nomi che si vogliono assegnare alle variabili.
 
         Esempio
         ----------
-        >>> Funzioni.def_variabili(3, ["x", "y", "z"])
+        >>> Funzioni.def_variabili(("x", "y", "z")])
         >>> print(variabili)
         [x, y, z]
         """
 
         logger_f.info("Chiamata la funzione 'def_variabili()'.")
 
-        global variabili
+        variabili: list = [symbols(f"{nomi[i]}") for i in range(len(nomi))]
+        logger_f.debug(f"Create le variabili --> {tuple(variabili)}")
 
-        try:
-            for i in range(N):
-                variabili.append(var := symbols(f"{nomi[i]}"))
-                logger_f.debug(f"Creata la variabile --> {var}")
-        except IndexError as _:
-            logger_f.error("Numero di variabili e nomi non corrispondono.")
+        return variabili
 
     @staticmethod
-    def derivate(G, N: int, misure: ndarray):
+    def derivate(G, variabili: list, misure: ndarray) -> list:
         """
         Questa funzione calcola le derivate parziali di G e le valuta in corrispondenza delle
         misure dirette (x_10,...,x_n0). In particolare modifica la lista globale `derivate` aggiungendole
@@ -114,8 +106,8 @@ class Functions:
         ----------
         G:
             Espressione Sympy della funzione G(x_1,...,x_n).
-        N: int
-            Numero di variabili della funzione G.
+        variabili: list
+            Lista delle variabili sympy x_1,x_2,...,x_n.
         misure: numpy.ndarray
             Lista Numpy con i valori [x_10,...,x_n0]
 
@@ -131,20 +123,25 @@ class Functions:
 
         logger_f.info("Chiamata la funzione 'derivate()'.")
 
-        global derivate
+        derivate: list = []
 
         # calcolo espressione derivate parziali
-        for i in range(N):
-            der = lambdify(variabili, x := diff(G, variabili[i]))
-            logger_f.debug(f"Ottenuta la derivata --> {Functions.display(str(x))}.")
+        if len(variabili) == len(misure):
+            for i in range(len(variabili)):
+                derivata_simbolica = lambdify(variabili, x := diff(G, variabili[i]))
+                logger_f.debug(f"Ottenuta la derivata --> {Functions.display(str(x))}.")
 
-            derivate.append(val := der(*list(misure)))
-            logger_f.debug(f"Ottenuta il valore della derivata --> {val}.")
+                derivate.append(val := derivata_simbolica(*list(misure)))
+                logger_f.debug(f"Ottenuta il valore della derivata --> {val}.")
+        else:
+            logger_f.error(
+                "Il numero di variabili non corrisponde al numero di misure!"
+            )
 
-        derivate = array(derivate)
+        return array(derivate)
 
     @staticmethod
-    def display(text):
+    def display(text: str) -> str:
         text = text.replace("**", "^")
         text = text.replace("*", "")
         text = text.replace("exp", "e^")
@@ -152,11 +149,74 @@ class Functions:
         return text
 
 
+def propagazione_errori(
+    nomi_var: tuple, G: str, x_val: ndarray, x_err: ndarray, output: bool
+) -> float64:
+    """
+    Questa funzione calcola finalmente l'errore sulla grandezza G a partire dai valori ottenuti
+    mediante le funzioni definite nella classe `Funzioni`.
+
+    Parametri
+    ----------
+    nomi_var: tuple
+        Nomi che si vogliono assegnare alle variabili.
+    G: str
+        Espressione della funzione G in linguaggio Mathematica.
+    x_val: ndarray
+        Lista Numpy con i valori [x_10,...,x_n0].
+    x_err: ndarray
+        Lista Numpy con i valori degli errori su [x_10,...,x_n0].
+    output: bool
+        Se True, viene mostrato il processo di calcolo dell'errore.
+
+    Returns
+    ----------
+    out: float64
+        Valore numerico dell'errore ottenuto dopo la propagazione.
+
+
+    Esempio
+    ----------
+    >>> data = array([1, 2])
+    >>> err = array([0.1, 0.3])
+    >>> propagazione_errori(2, ("a", "b"), "a^2 + b", data, err, True)
+    Variabili: [a, b]
+    Funzione: a**2 + b
+    Errore propagato: 0.36055512754639896
+    """
+
+    # definizione variabili
+    variabili = Functions.def_variabili(nomi_var)
+
+    # definizione funzione
+    G = parse_mathematica(G)
+    derivate = Functions.derivate(G, variabili, x_val)
+
+    # valore funzione
+    G_val = lambdify(variabili, G)(*list(x_val))
+    logger.debug("Calcolato il valore di G.")
+
+    # calcolo errore
+    G_err = sqrt(((derivate * x_err) ** 2).sum())
+    logger.debug("Calcolato l'errore su G.")
+
+    if output:
+        print(
+            f"\nFunzione: G({','.join(list(nomi_var))}) = {Functions.display(str(G))}\n"
+        )
+        print(
+            f"Valore misura: G({','.join(f'{nomi_var[i]}0' for i in range(len(nomi_var)))}) = {G_val}\n"
+        )
+        print(f"Errore propagato: {G_err}\n")
+    else:
+        pass
+
+    return G_err
+
+
 if __name__ == "__main__":
     Functions.activate_logging()
 
-    Functions.def_variabili(2, ("x", "y"))
-
-    G = parse_mathematica("x^2 + y^2")
-
-    Functions.derivate(G, 2, array([0.1, 0.2]))
+    propagazione_errori(
+        ("x", "y"), "x^2 + y^2", array([0.1, 0.2]), array([0.01, 0.05]), True
+    )
