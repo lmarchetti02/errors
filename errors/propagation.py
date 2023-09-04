@@ -44,7 +44,7 @@ class Functions:
         logger_f.propagate = False  # evita log ripetuti
 
         # Crea un handler
-        handler = logging.FileHandler("log/log.log")
+        handler = logging.FileHandler(f"log/{log_file}")
         handler.setLevel(logging.DEBUG)
 
         # Formatta l'handler
@@ -61,7 +61,7 @@ class Functions:
 
         if not status:
             try:
-                os.remove("log.log")
+                os.remove(log_file)
                 logging.disable(logging.ERROR)
             except FileNotFoundError as e:
                 logger_f.exception(e)
