@@ -12,7 +12,7 @@ logger_f: logging.Logger = None
 
 class Functions:
     @staticmethod
-    def activate_logging(log_file: Optional[str] = "log.log", **kwargs) -> None:
+    def activate_logging(status: bool = False, **kwargs) -> None:
         """
         Questa funzione attiva il logging della libreria propagazione.
 
@@ -28,7 +28,11 @@ class Functions:
             Attiva il logging se True, lo disattiva se 'False'. Di
             default viene impostata su True.
         """
+
         global logger, logger_f
+        log_file = kwargs.get(
+            "log_file",
+        )
 
         # Cancella il log precedente
         with open(f"log/{log_file}", "w") as file:
@@ -56,8 +60,6 @@ class Functions:
         # Aggiunge l'handler al logger
         logger.addHandler(handler)
         logger_f.addHandler(handler)
-
-        status = kwargs.get("status", True)
 
         if not status:
             try:
@@ -150,19 +152,14 @@ class Functions:
 
 
 def propagazione_errori(
-    nomi_var: tuple,
-    G: str,
-    x_val: ndarray,
-    x_err: ndarray,
-    output: bool,
-    log: tuple = (True, "log.log"),
+    nomi_var: tuple, G: str, x_val: ndarray, x_err: ndarray, output: bool, **kwargs
 ) -> float64:
     """
     Questa funzione calcola finalmente l'errore sulla grandezza G a partire dai valori ottenuti
     mediante le funzioni definite nella classe `Funzioni`.
 
     Parametri
-    ----------
+    ---
     nomi_var: tuple
         Nomi che si vogliono assegnare alle variabili.
     G: str
@@ -173,9 +170,12 @@ def propagazione_errori(
         Lista Numpy con i valori degli errori su [x_10,...,x_n0].
     output: bool
         Se True, viene mostrato il processo di calcolo dell'errore.
-    log: tuple
-        Attiva e disattiva il log della libreria, e specifica il file
-        in cui si vuole salvare il log. Di default è impostata su (True, "log.log).
+
+    Parametri opzionali
+    ---
+    log_file: str
+        Se viene indicato un file di tipo '.log', si attiva il
+        logging della libreria, che viene salvato nel file specificato.
 
     Returns
     ----------
@@ -193,7 +193,12 @@ def propagazione_errori(
     Errore propagato: 0.36055512754639896
     """
 
-    Functions.activate_logging(log[1], status=log[0])
+    log = kwargs.get("log_file", False)
+
+    if log:
+        Functions.activate_logging(status=True, log_file=log)
+    else:
+        Functions.activate_logging()
 
     # definizione variabili
     variabili = Functions.def_variabili(nomi_var)
