@@ -150,7 +150,12 @@ class Functions:
 
 
 def propagazione_errori(
-    nomi_var: tuple, G: str, x_val: ndarray, x_err: ndarray, output: bool
+    nomi_var: tuple,
+    G: str,
+    x_val: ndarray,
+    x_err: ndarray,
+    output: bool,
+    log: bool = True,
 ) -> float64:
     """
     Questa funzione calcola finalmente l'errore sulla grandezza G a partire dai valori ottenuti
@@ -185,6 +190,8 @@ def propagazione_errori(
     Errore propagato: 0.36055512754639896
     """
 
+    Functions.activate_logging(status=log)
+
     # definizione variabili
     variabili = Functions.def_variabili(nomi_var)
 
@@ -215,8 +222,6 @@ def propagazione_errori(
 
 
 if __name__ == "__main__":
-    Functions.activate_logging()
-
     propagazione_errori(
         ("x", "y", "z"),
         "x^2 + y^2 + z^2",
