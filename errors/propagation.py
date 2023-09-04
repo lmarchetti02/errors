@@ -205,9 +205,9 @@ def propagazione_errori(
             f"\nFunzione: G({','.join(list(nomi_var))}) = {Functions.display(str(G))}\n"
         )
         print(
-            f"Valore misura: G({','.join(f'{nomi_var[i]}0' for i in range(len(nomi_var)))}) = {G_val}\n"
+            f"Valore misura: G({', '.join(f'{x_val[i]}' for i in range(len(nomi_var)))}) = {G_val:e}\n"
         )
-        print(f"Errore propagato: {G_err}\n")
+        print(f"Errore propagato: {G_err:.1e}\n")
     else:
         pass
 
@@ -218,5 +218,9 @@ if __name__ == "__main__":
     Functions.activate_logging()
 
     propagazione_errori(
-        ("x", "y"), "x^2 + y^2", array([0.1, 0.2]), array([0.01, 0.05]), True
+        ("x", "y", "z"),
+        "x^2 + y^2 + z^2",
+        array([0.1, 0.2, 0.3]),
+        array([0.01, 0.05, 0.1]),
+        True,
     )
