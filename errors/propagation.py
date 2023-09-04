@@ -155,7 +155,7 @@ def propagazione_errori(
     x_val: ndarray,
     x_err: ndarray,
     output: bool,
-    log: bool = True,
+    log: tuple = (True, "log.log"),
 ) -> float64:
     """
     Questa funzione calcola finalmente l'errore sulla grandezza G a partire dai valori ottenuti
@@ -173,9 +173,9 @@ def propagazione_errori(
         Lista Numpy con i valori degli errori su [x_10,...,x_n0].
     output: bool
         Se True, viene mostrato il processo di calcolo dell'errore.
-    log: bool
-        Attiva e disattiva il log della libraria. Di default
-        è impostata su True.
+    log: tuple
+        Attiva e disattiva il log della libreria, e specifica il file
+        in cui si vuole salvare il log. Di default è impostata su (True, "log.log).
 
     Returns
     ----------
@@ -193,7 +193,7 @@ def propagazione_errori(
     Errore propagato: 0.36055512754639896
     """
 
-    Functions.activate_logging(status=log)
+    Functions.activate_logging(log[1], status=log[0])
 
     # definizione variabili
     variabili = Functions.def_variabili(nomi_var)
