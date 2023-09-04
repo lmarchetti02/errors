@@ -173,6 +173,9 @@ def propagazione_errori(
         Lista Numpy con i valori degli errori su [x_10,...,x_n0].
     output: bool
         Se True, viene mostrato il processo di calcolo dell'errore.
+    log: bool
+        Attiva e disattiva il log della libraria. Di default
+        è impostata su True.
 
     Returns
     ----------
