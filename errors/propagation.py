@@ -61,7 +61,7 @@ class Functions:
 
         if not status:
             try:
-                os.remove(log_file)
+                os.remove(f"log/{log_file}")
                 logging.disable(logging.ERROR)
             except FileNotFoundError as e:
                 logger_f.exception(e)
