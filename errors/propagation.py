@@ -12,7 +12,7 @@ logger_f: logging.Logger = None
 
 class Functions:
     @staticmethod
-    def activate_logging(status: bool = False, **kwargs) -> None:
+    def activate_logging(log_file: str = "log.log") -> None:
         """
         Questa funzione attiva il logging della libreria propagazione.
 
@@ -21,18 +21,9 @@ class Functions:
         log_file: str
             File .log dove viene memorizzato il log. Di default è
             'log.log', ma può essere cambiato.
-
-        Parametri opzionali
-        ---
-        status: bool
-            Attiva il logging se True, lo disattiva se 'False'. Di
-            default viene impostata su True.
         """
 
         global logger, logger_f
-        log_file = kwargs.get(
-            "log_file",
-        )
 
         # Cancella il log precedente
         with open(f"log/{log_file}", "w") as file:
@@ -60,17 +51,6 @@ class Functions:
         # Aggiunge l'handler al logger
         logger.addHandler(handler)
         logger_f.addHandler(handler)
-
-        if not status:
-            try:
-                os.remove(f"log/{log_file}")
-                logging.disable(logging.ERROR)
-            except FileNotFoundError as e:
-                logger_f.exception(e)
-        elif status:
-            pass
-        else:
-            raise TypeError("The 'status' must be of the bool type.")
 
     @staticmethod
     def def_variabili(nomi: tuple) -> list:
@@ -196,7 +176,7 @@ def propagazione_errori(
     log = kwargs.get("log_file", False)
 
     if log:
-        Functions.activate_logging(status=True, log_file=log)
+        Functions.activate_logging(log_file=log)
     else:
         Functions.activate_logging()
 
