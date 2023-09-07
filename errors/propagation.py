@@ -12,7 +12,7 @@ logger_f: logging.Logger = None
 
 class Functions:
     @staticmethod
-    def activate_logging(log_file: str = "log.log") -> None:
+    def activate_logging(log_file: str = "log_propagation.log") -> None:
         """
         Questa funzione attiva il logging della libreria propagazione.
 
