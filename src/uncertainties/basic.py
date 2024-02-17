@@ -1,6 +1,8 @@
 import numpy as np
+from numba import njit, objmode
 
 
+@njit(fastmath=True)
 def product(a: np.ndarray, b: np.ndarray, a_err: np.ndarray, b_err: np.ndarray) -> np.ndarray:
     """
     This function propagates the uncertainties in the case of products of
@@ -18,9 +20,6 @@ def product(a: np.ndarray, b: np.ndarray, a_err: np.ndarray, b_err: np.ndarray) 
         The array with the errors on the values of the second quantity.
     """
 
-    if len(a) != len(b) or len(a) != len(a_err) or len(a) != len(b_err):
-        raise ValueError("The arrays don't have the same size!")
-
     errors = np.empty(len(a))
 
     for _ in range(len(a)):
@@ -29,10 +28,11 @@ def product(a: np.ndarray, b: np.ndarray, a_err: np.ndarray, b_err: np.ndarray) 
     return errors
 
 
+@njit(fastmath=True)
 def quotient(a: np.ndarray, b: np.ndarray, a_err: np.ndarray, b_err: np.ndarray) -> np.ndarray:
     """
     This function propagates the uncertainties in the case of quotients of
-    physical quantities, that is, `G = A/B`).
+    physical quantities, that is, `G = A/B`.
 
     Parameters
     ---
@@ -45,9 +45,6 @@ def quotient(a: np.ndarray, b: np.ndarray, a_err: np.ndarray, b_err: np.ndarray)
     b_err: numpy.ndarray
         The array with the errors on the values of the second quantity.
     """
-
-    if len(a) != len(b) or len(a) != len(a_err) or len(a) != len(b_err):
-        raise ValueError("The arrays don't have the same size!")
 
     errors = np.empty(len(a))
 
