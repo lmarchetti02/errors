@@ -1,5 +1,6 @@
 """
+A small Python project for propagating uncertainties fast.
 """
 
 from .utils import check_sizes
-from .basic import product, quotient
+from .basic import products, quotients, sums
