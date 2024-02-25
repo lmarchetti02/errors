@@ -161,3 +161,4 @@ cython_debug/
 build_install.sh
 /.vscode
 /tests
+.DS_Store
