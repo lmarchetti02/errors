@@ -1,4 +1,4 @@
-# Uncertainties
+# Errors
 
 A data-analysis-oriented library for propagating errors easily.
 
@@ -32,7 +32,7 @@ Follow the steps below to install _Plotter_ (Unix-like systems):
 6. If the installation was successful, _Plotter_ can be
    imported simply by
    ```python
-   import uncertainties as u
+   import errors as e
    ```
 
 __Note__: It is possible that the commands to use are `python` and `pip`, instead of, respectively, `python3` and `pip3`.
@@ -49,7 +49,7 @@ The following example shows all the main features of the library.
 
 ```python
 import numpy as np
-import uncertainties as u
+import errors as e
 
 size = 1_000_000
 
@@ -63,19 +63,19 @@ y_err = np.random.uniform(0.1, 0.2, size)
 
 # product
 p = x * y
-p_err = u.products(x, y, x_err, y_err)
+p_err = e.products(x, y, x_err, y_err)
 
 # quotient
 q = x / y
-q_err = u.quotients(x, y, x_err, y_err)
+q_err = e.quotients(x, y, x_err, y_err)
 
 # sum
 s = x + y
-s_err = u.sums(x, y, x_err, y_err)
+s_err = e.sums(x, y, x_err, y_err)
 
 # function
 f = x**2 + 2 * y * x
-f_err = u.functions(("x", "y"), "x^2 + 2*y*x", [x, y], [x_err, y_err])
+f_err = e.functions(("x", "y"), "x^2 + 2*y*x", [x, y], [x_err, y_err])
 ```
 
 ## License
