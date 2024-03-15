@@ -1,9 +1,10 @@
 import numpy as np
 import sympy as sp
+from typing import LiteralString
 from sympy.parsing.mathematica import parse_mathematica
 
 
-def functions(var_names: tuple[str], f_expression: str, values: list, errors: list) -> np.ndarray:
+def functions(var_names: tuple[str, ...], f_expression: str, values: list, errors: list) -> np.ndarray:
     """
     This function propagates the uncertainties in the case of functions
     of physical quantities, that is, `G = G(A, B, ...)`.
