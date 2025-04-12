@@ -142,7 +142,7 @@ def sums(a: np.ndarray, b: np.ndarray, a_err: np.ndarray, b_err: np.ndarray, *ar
     If the user wants to consider more variables in the sum, it is sufficient
     to pass the arrays of the extra variables to the function.
 
-    IMPORTANT: The extra arrays must be in the order following order:
+    IMPORTANT: The extra arrays must be in the following order:
                (variable, error, variable, error, ...).
     """
 
